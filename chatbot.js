@@ -1,18 +1,22 @@
-// filepath: /c:/Users/Artsy/OneDrive/Documents/mini_project_1/chatbot.js
-const { Configuration, OpenAIApi } = require('openai');
+const OpenAI = require("openai");
+require("dotenv").config(); // Load environment variables
 
-const configuration = new Configuration({
-    apiKey: process.env.OPENAI_API_KEY, // Use environment variable for API key
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY, // Ensure your API key is set
 });
-const openai = new OpenAIApi(configuration);
 
 async function sendMessageToOpenAI(message) {
-    const response = await openai.createCompletion({
-        model: 'text-davinci-003',
-        prompt: message,
-        max_tokens: 150,
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: message }],
     });
-    return response.data.choices[0].text.trim();
+
+    return response.choices[0].message.content.trim();
+  } catch (error) {
+    console.error("OpenAI API Error:", error);
+    return "Error processing your request.";
+  }
 }
 
 module.exports = { sendMessageToOpenAI };
